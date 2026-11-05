@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarlyCare - Prévention du décrochage universitaire</title>
+
+<style>
+:root {
+  --primary:#2457a6;
+  --primary-dark:#193f7b;
+  --secondary:#edf3fc;
+  --background:#f5f7fb;
+  --surface:#fff;
+  --text:#202b3c;
+  --muted:#718096;
+  --border:#e1e7f0;
+  --success:#16845b;
+  --danger:#c44747;
+  --warning:#c17a13;
+  --radius:14px;
+  --shadow:0 5px 22px rgba(31,54,88,.07);
+}
+
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body {
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--background);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,input,select {font:inherit}
+
+.topbar {
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:17px 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brand-icon {
+  width:43px;
+  height:43px;
+  border-radius:12px;
+  background:var(--primary);
+  color:white;
+  display:grid;
+  place-items:center;
+  font-size:21px;
+  font-weight:bold;
+}
+
+.brand h1 {font-size:17px;margin-bottom:4px}
+.brand p {font-size:12px;color:var(--muted)}
+
+.top-label {
+  color:var(--primary);
+  background:var(--secondary);
+  padding:9px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.container {
+  width:min(1200px,92%);
+  margin:32px auto;
+}
+
+.page-heading {margin-bottom:25px}
+.page-heading h2 {font-size:27px;margin-bottom:9px}
+.page-heading p {
+  color:var(--muted);
+  line-height:1.6;
+  font-size:14px;
+}
+
+.layout {
+  display:grid;
+  grid-template-columns:245px minmax(0,1fr);
+  gap:22px;
+  align-items:start;
+}
+
+.sidebar,.main-panel,.result-panel {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.sidebar {padding:18px}
+.sidebar h3 {
+  font-size:13px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  margin:4px 0 14px;
+}
+
+.mode-button {
+  width:100%;
+  border:1px solid transparent;
+  background:transparent;
+  padding:13px 12px;
+  border-radius:10px;
+  text-align:left;
+  cursor:pointer;
+  margin-bottom:8px;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  font-size:13px;
+}
+
+.mode-button:hover {background:var(--secondary)}
+.mode-button.active {
+  background:var(--secondary);
+  border-color:#cbdaf1;
+  color:var(--primary);
+}
+
+.sidebar-note {
+  border-top:1px solid var(--border);
+  padding-top:16px;
+  margin-top:18px;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--muted);
+}
+
+.main-panel {padding:25px;min-width:0}
+
+.panel-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:22px;
+}
+
+.panel-heading h3 {font-size:19px;margin-bottom:7px}
+.panel-heading p {
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.counter {
+  background:var(--secondary);
+  color:var(--primary);
+  border-radius:20px;
+  padding:7px 11px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.section {
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:19px;
+  margin-bottom:17px;
+}
+
+.section-title {
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:17px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.section-number {
+  background:var(--secondary);
+  color:var(--primary);
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.form-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+
+.field {min-width:0}
+
+.field label {
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:7px;
+  line-height:1.4;
+}
+
+.field input {
+  width:100%;
+  height:42px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:0 11px;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+  font-size:13px;
+}
+
+.field input:focus {
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(36,87,166,.10);
+}
+
+.field input[readonly] {
+  background:#f1f4f8;
+  color:#53657d;
+}
+
+.field small {
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:5px;
+  line-height:1.4;
+}
+
+.actions {
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:22px;
+}
+
+.btn {
+  border:none;
+  border-radius:9px;
+  padding:12px 17px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size:13px;
+  transition:.2s;
+}
+
+.btn-primary {color:white;background:var(--primary)}
+.btn-primary:hover {background:var(--primary-dark)}
+.btn-light {color:var(--text);background:#eef1f6}
+.btn-outline {
+  color:var(--primary);
+  border:1px solid #cbdaf1;
+  background:white;
+}
+.btn:disabled {opacity:.5;cursor:not-allowed}
+
+.mode-content {display:none}
+.mode-content.active {display:block}
+
+.upload-box {
+  border:2px dashed #b9c9e0;
+  background:#f9fbff;
+  border-radius:13px;
+  padding:38px 20px;
+  text-align:center;
+  margin:20px 0;
+}
+
+.upload-icon {font-size:35px;margin-bottom:12px}
+.upload-box h4 {margin-bottom:8px;font-size:16px}
+.upload-box p {
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:16px;
+}
+
+.upload-box input {max-width:100%;font-size:12px}
+.file-info {
+  margin-top:14px;
+  font-size:13px;
+  color:var(--success);
+  font-weight:bold;
+}
+
+.validation-box {
+  display:none;
+  padding:15px;
+  border-radius:10px;
+  margin-top:16px;
+  font-size:13px;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+
+.validation-box.success {
+  display:block;
+  background:#edf8f2;
+  color:#176b49;
+  border:1px solid #c9e9d7;
+}
+
+.validation-box.error {
+  display:block;
+  background:#fff1f1;
+  color:#a43131;
+  border:1px solid #f0cccc;
+}
+
+.template-note {
+  background:var(--secondary);
+  padding:14px;
+  border-radius:10px;
+  color:#405574;
+  font-size:12px;
+  line-height:1.6;
+  margin-top:17px;
+}
+
+.result-panel {margin-top:22px;padding:22px}
+.result-panel h3 {font-size:16px;margin-bottom:8px}
+.result-panel>p {
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+.result-placeholder {
+  margin-top:17px;
+  padding:22px;
+  border-radius:10px;
+  background:#f7f9fc;
+  border:1px dashed #cbd5e2;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+
+.result-placeholder strong {color:var(--primary)}
+.result-table-wrap {overflow-x:auto;margin-top:18px}
+
+.result-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  text-align:left;
+}
+
+.result-table th {
+  padding:10px;
+  background:var(--secondary);
+  white-space:nowrap;
+}
+
+.result-table td {
+  padding:9px 10px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+
+.xai-panel {
+  margin-top:22px;
+  padding:18px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#fbfcff;
+  text-align:left;
+}
+
+.xai-panel h4 {
+  margin:0 0 10px;
+  color:var(--primary-dark);
+  font-size:14px;
+}
+
+.xai-summary {
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text);
+  margin-bottom:15px;
+}
+
+.xai-factor {
+  display:grid;
+  grid-template-columns:minmax(130px,1fr) auto;
+  gap:8px 14px;
+  padding:11px 0;
+  border-bottom:1px solid var(--border);
+  align-items:center;
+}
+
+.xai-factor:last-child {border-bottom:0}
+
+.xai-factor-name {font-size:12px;font-weight:bold}
+.xai-factor-value {
+  display:block;
+  color:var(--muted);
+  margin-top:4px;
+  font-size:11px;
+}
+
+.xai-up {color:#b42318;font-weight:700;font-size:12px}
+.xai-down {color:#16845b;font-weight:700;font-size:12px}
+.xai-neutral {color:var(--muted);font-weight:700;font-size:12px}
+
+.xai-recommendations {
+  margin:8px 0 0 20px;
+  line-height:1.7;
+  font-size:12px;
+}
+
+.xai-recommendations li {margin-bottom:6px}
+
+.xai-note {
+  margin-top:14px;
+  padding:11px 12px;
+  background:#f1f5fb;
+  border-radius:8px;
+  color:#526174;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.batch-xai {min-width:180px}
+.batch-xai summary {
+  cursor:pointer;
+  color:var(--primary);
+  font-weight:600;
+  padding:5px 0;
+}
+
+.batch-xai .xai-panel {
+  min-width:280px;
+  max-width:440px;
+}
+
+.footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  padding:28px 10px;
+}
+
+.hidden {display:none!important}
+
+@media(max-width:850px) {
+  .layout {grid-template-columns:1fr}
+  .sidebar {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+  }
+  .sidebar h3 {width:100%}
+  .mode-button {width:auto;margin:0}
+  .sidebar-note {width:100%}
+}
+
+@media(max-width:560px) {
+  .topbar {padding:14px 4%}
+  .top-label {display:none}
+  .container {width:94%;margin-top:22px}
+  .page-heading h2 {font-size:22px}
+  .main-panel {padding:15px}
+  .form-grid {grid-template-columns:1fr}
+  .panel-heading {flex-direction:column}
+  .section {padding:14px}
+  .actions .btn {width:100%}
+  .xai-factor {grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">EC</div>
+    <div>
+      <h1>EarlyCare Prévention du décrochage</h1>
+      <p>Système d'aide à la décision universitaire</p>
+    </div>
+  </div>
+  <div class="top-label">Projet Data Mining</div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Évaluation du risque de décrochage</h2>
+    <p>
+      Cette plateforme permet de préparer les données des étudiants
+      afin d'identifier les profils nécessitant un accompagnement prioritaire
+      à la fin du premier semestre.
+    </p>
+  </div>
+
+  <div class="layout">
+
+    <aside class="sidebar">
+      <h3>Mode d'utilisation</h3>
+
+      <button type="button" class="mode-button active"
+              id="individualTab"
+              onclick="switchMode('individual')">
+        <span>👤</span>
+        Saisie individuelle
+      </button>
+
+      <button type="button" class="mode-button"
+              id="csvTab"
+              onclick="switchMode('csv')">
+        <span>📁</span>
+        Importation CSV
+      </button>
+
+      <div class="sidebar-note">
+        <strong>Objectif :</strong><br>
+        Préparer les informations des étudiants pour une classification
+        par le modèle de prédiction.
+        <br><br>
+        <strong>Capacité annuelle :</strong> 200 places de tutorat.
+      </div>
+    </aside>
+
+    <div>
+
+      <!-- FORMULAIRE INDIVIDUEL -->
+
+      <section class="main-panel mode-content active"
+               id="individualMode">
+
+        <div class="panel-heading">
+          <div>
+            <h3>Fiche individuelle de l'étudiant</h3>
+            <p>Saisissez les informations disponibles à la fin du premier semestre.</p>
+          </div>
+          <span class="counter">31 variables</span>
+        </div>
+
+        <form id="studentForm">
+
+          <div id="dynamicStudentFields"></div>
+
+          <div class="actions">
+            <button type="reset" class="btn btn-light">
+              Réinitialiser
+            </button>
+
+            <button type="submit" class="btn btn-primary">
+              Lancer la prédiction
+            </button>
+          </div>
+
+        </form>
+
+        <div id="individualMessage"
+             class="validation-box"
+             role="status"
+             aria-live="polite"></div>
+
+      </section>
+
+
+      <!-- IMPORT CSV -->
+
+      <section class="main-panel mode-content" id="csvMode">
+
+        <div class="panel-heading">
+          <div>
+            <h3>Importation d'un fichier CSV</h3>
+            <p>Importez les données de plusieurs étudiants dans un seul fichier.</p>
+          </div>
+          <span class="counter">Format CSV</span>
+        </div>
+
+        <div class="upload-box">
+          <div class="upload-icon">📂</div>
+
+          <h4>Importer les données des étudiants</h4>
+
+          <p>
+            Sélectionnez un fichier CSV contenant les 31 variables attendues
+            par le modèle.
+            <br>
+            Le fichier doit utiliser les noms exacts des colonnes.
+          </p>
+
+          <input type="file" id="csvFile" accept=".csv,text/csv">
+
+          <div id="fileInfo" class="file-info"></div>
+        </div>
+
+        <div id="csvValidation"
+             class="validation-box"
+             role="status"
+             aria-live="polite"></div>
+
+        <div class="template-note">
+          <strong>Important :</strong>
+          Le fichier doit contenir les variables disponibles à la fin du premier semestre.
+          Les colonnes Target et Dropout_Binary ne doivent pas être fournies
+          comme variables d'entrée.
+          Les colonnes supplémentaires éventuelles sont ignorées par l'API CSV.
+        </div>
+
+        <div class="actions">
+
+          <button type="button"
+                  class="btn btn-outline"
+                  onclick="downloadTemplate()">
+            Télécharger le modèle CSV
+          </button>
+
+          <button type="button"
+                  class="btn btn-primary"
+                  id="validateCsvButton"
+                  onclick="validateCSV()"
+                  disabled>
+            Vérifier et prédire
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- RESULTATS -->
+
+      <section class="result-panel">
+
+        <h3>Résultats de l'évaluation</h3>
+
+        <p>
+          Résultats générés par le modèle Random Forest connecté à l'API Python.
+        </p>
+
+        <div id="resultContent"
+             class="result-placeholder"
+             aria-live="polite">
+
+          <strong>En attente d'une prédiction...</strong>
+          <br>
+          Saisissez les informations d'un étudiant ou importez un fichier CSV.
+
+        </div>
+
+        <div class="actions">
+
+          <button id="downloadXmlButton"
+                  class="btn btn-outline hidden"
+                  type="button"
+                  onclick="downloadXML()">
+            Télécharger le rapport XML XAI
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    Projet universitaire de Data Mining — Prévention du décrochage universitaire
+  </footer>
+
+</main>
+
+
+<script>
+
+// =====================================================
+// 1. API CONFIGURATION
+// =====================================================
+
+const API_BASE = "http://127.0.0.1:8000";
+
+
+// =====================================================
+// 2. EXACT MODEL FEATURES
+// =====================================================
+
+// Important : la cinquième variable se termine par une tabulation.
+
+const REQUIRED_COLUMNS = [
+  "Marital status",
+  "Application mode",
+  "Application order",
+  "Course",
+  "Daytime/evening attendance\t",
+  "Previous qualification",
+  "Previous qualification (grade)",
+  "Nacionality",
+  "Mother's qualification",
+  "Father's qualification",
+  "Mother's occupation",
+  "Father's occupation",
+  "Admission grade",
+  "Displaced",
+  "Educational special needs",
+  "Debtor",
+  "Tuition fees up to date",
+  "Gender",
+  "Scholarship holder",
+  "Age at enrollment",
+  "International",
+  "Curricular units 1st sem (credited)",
+  "Curricular units 1st sem (enrolled)",
+  "Curricular units 1st sem (evaluations)",
+  "Curricular units 1st sem (approved)",
+  "Curricular units 1st sem (grade)",
+  "Curricular units 1st sem (without evaluations)",
+  "Unemployment rate",
+  "Inflation rate",
+  "GDP",
+  "Success_Rate"
+];
+
+
+// =====================================================
+// 3. FORM FIELDS
+// =====================================================
+
+const FIELD_GROUPS = [
+
+  {
+    title:"Informations personnelles et administratives",
+    fields:[
+      ["Marital status","Marital_status","Situation matrimoniale"],
+      ["Application mode","Application_mode","Mode de candidature"],
+      ["Application order","Application_order","Ordre de candidature"],
+      ["Course","Course","Filière"],
+      ["Daytime/evening attendance\t","Daytime","Daytime/evening attendance"],
+      ["Previous qualification","Previous_qualification","Diplôme antérieur"],
+      ["Previous qualification (grade)","Previous_grade","Note du diplôme antérieur"],
+      ["Nacionality","Nacionality","Nationalité"],
+      ["Mother's qualification","Mother_qualification","Mother's qualification"],
+      ["Father's qualification","Father_qualification","Father's qualification"],
+      ["Mother's occupation","Mother_occupation","Mother's occupation"],
+      ["Father's occupation","Father_occupation","Father's occupation"],
+      ["Admission grade","Admission_grade","Admission grade"],
+      ["Age at enrollment","Age","Age at enrollment"]
+    ]
+  },
+
+  {
+    title:"Situation sociale et financière",
+    fields:[
+      ["Displaced","Displaced","Displaced"],
+      ["Educational special needs","Special_needs","Educational special needs"],
+      ["Debtor","Debtor","Debtor"],
+      ["Tuition fees up to date","Tuition","Tuition fees up to date"],
+      ["Gender","Gender","Gender"],
+      ["Scholarship holder","Scholarship","Scholarship holder"],
+      ["International","International","International"]
+    ]
+  },
+
+  {
+    title:"Résultats académiques du premier semestre",
+    fields:[
+      ["Curricular units 1st sem (credited)","Credited","Curricular units 1st sem (credited)"],
+      ["Curricular units 1st sem (enrolled)","Enrolled","Curricular units 1st sem (enrolled)"],
+      ["Curricular units 1st sem (evaluations)","Evaluations","Curricular units 1st sem (evaluations)"],
+      ["Curricular units 1st sem (approved)","Approved","Curricular units 1st sem (approved)"],
+      ["Curricular units 1st sem (grade)","Grade","Curricular units 1st sem (grade)"],
+      ["Curricular units 1st sem (without evaluations)","Without_evaluations","Curricular units 1st sem (without evaluations)"]
+    ]
+  },
+
+  {
+    title:"Indicateurs macroéconomiques",
+    fields:[
+      ["Unemployment rate","Unemployment","Unemployment rate"],
+      ["Inflation rate","Inflation","Inflation rate"],
+      ["GDP","GDP","GDP"]
+    ]
+  }
+
+];
+
+
+// =====================================================
+// 4. GLOBAL VARIABLES
+// =====================================================
+
+let selectedCSV = null;
+let latestXMLData = null;
+
+
+// =====================================================
+// 5. GENERATE FORM
+// =====================================================
+
+function generateStudentForm() {
+
+  const container = document.getElementById("dynamicStudentFields");
+
+  let html = "";
+
+  FIELD_GROUPS.forEach((group,index) => {
+
+    html += `
+      <div class="section">
+
+        <div class="section-title">
+          <span class="section-number">${index+1}</span>
+          ${escapeHTML(group.title)}
+        </div>
+
+        <div class="form-grid">
+    `;
+
+    group.fields.forEach(field => {
+
+      const name = field[0];
+      const id = field[1];
+      const label = field[2];
+
+      const isEnrolled = name === "Curricular units 1st sem (enrolled)";
+      const minValue = isEnrolled ? 'min="0"' : "";
+
+      const tabHelp = name === "Daytime/evening attendance\t"
+        ? `<small>Le nom technique de cette variable contient une tabulation finale.</small>`
+        : "";
+
+      html += `
+        <div class="field">
+
+          <label for="${escapeHTML(id)}">
+            ${escapeHTML(label)}
+          </label>
+
+          <input
+            id="${escapeHTML(id)}"
+            name="${escapeHTML(name)}"
+            type="number"
+            step="any"
+            ${minValue}
+            required
+          >
+
+          ${tabHelp}
+
+        </div>
+      `;
+
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+  });
+
+
+  // Success Rate field
+
+  html += `
+    <div class="section">
+
+      <div class="section-title">
+        <span class="section-number">5</span>
+        Variable calculée automatiquement
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label for="Success_Rate">Success_Rate</label>
+
+          <input
+            id="Success_Rate"
+            name="Success_Rate"
+            type="number"
+            step="any"
+            min="0"
+            max="1"
+            readonly
+            required
+          >
+
+          <small>
+            Calcul automatique : unités approuvées / unités inscrites.
+            Si unités inscrites = 0, le taux vaut 0.
+          </small>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+generateStudentForm();
+
+
+// =====================================================
+// 6. NAVIGATION
+// =====================================================
+
+function switchMode(mode) {
+
+  const individualMode = document.getElementById("individualMode");
+  const csvMode = document.getElementById("csvMode");
+
+  const individualTab = document.getElementById("individualTab");
+  const csvTab = document.getElementById("csvTab");
+
+  individualMode.classList.remove("active");
+  csvMode.classList.remove("active");
+
+  individualTab.classList.remove("active");
+  csvTab.classList.remove("active");
+
+  if (mode === "individual") {
+
+    individualMode.classList.add("active");
+    individualTab.classList.add("active");
+
+  } else {
+
+    csvMode.classList.add("active");
+    csvTab.classList.add("active");
+
+  }
+}
+
+
+// =====================================================
+// 7. HTML ESCAPING
+// =====================================================
+
+function escapeHTML(value) {
+
+  return String(value ?? "").replace(/[&<>"']/g,function(char) {
+
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[char];
+
+  });
+
+}
+
+
+// =====================================================
+// 8. XML ESCAPING
+// =====================================================
+
+function xmlEscape(value) {
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&apos;");
+
+}
+
+
+// =====================================================
+// 9. DISPLAY HELPERS
+// =====================================================
+
+function showMessage(elementId,message,type) {
+
+  const element = document.getElementById(elementId);
+
+  element.className = "validation-box " + type;
+  element.textContent = message;
+
+}
+
+
+function showResult(html) {
+
+  document.getElementById("resultContent").innerHTML = html;
+
+}
+
+
+function showXMLButton(show) {
+
+  document.getElementById("downloadXmlButton")
+    .classList.toggle("hidden",!show);
+
+}
+
+
+function getPredictedLabel(prediction) {
+
+  return String(prediction) === "1"
+    ? "Dropout"
+    : "Non-Dropout";
+
+}
+
+
+function formatProbability(value) {
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "Non disponible";
+  }
+
+  return (number*100).toFixed(2)+"%";
+
+}
+
+
+function getApiErrorMessage(payload,fallback) {
+
+  if (payload && typeof payload.detail === "string") {
+    return payload.detail;
+  }
+
+  if (payload && payload.detail) {
+    return JSON.stringify(payload.detail);
+  }
+
+  if (payload && payload.message) {
+    return String(payload.message);
+  }
+
+  return fallback;
+
+}
+
+
+// =====================================================
+// 10. SUCCESS RATE CALCULATION
+// =====================================================
+
+function updateSuccessRate() {
+
+  const enrolledInput = document.getElementById("Enrolled");
+  const approvedInput = document.getElementById("Approved");
+  const successRateInput = document.getElementById("Success_Rate");
+
+  const enrolledText = enrolledInput.value.trim();
+  const approvedText = approvedInput.value.trim();
+
+  if (enrolledText === "" || approvedText === "") {
+
+    successRateInput.value = "";
+    return;
+
+  }
+
+  const enrolled = Number(enrolledText);
+  const approved = Number(approvedText);
+
+  if (
+    !Number.isFinite(enrolled) ||
+    !Number.isFinite(approved) ||
+    enrolled < 0
+  ) {
+
+    successRateInput.value = "";
+    return;
+
+  }
+
+  if (enrolled === 0) {
+
+    successRateInput.value = "0";
+    return;
+
+  }
+
+  successRateInput.value = (
+    approved/enrolled
+  ).toFixed(10).replace(/0+$/,"").replace(/\.$/,"");
+
+}
+
+
+document.getElementById("Enrolled")
+  .addEventListener("input",updateSuccessRate);
+
+document.getElementById("Approved")
+  .addEventListener("input",updateSuccessRate);
+
+
+// =====================================================
+// 11. SHAP EXPLANATION DISPLAY
+// =====================================================
+
+function renderXaiExplanation(xai) {
+
+  if (!xai || !Array.isArray(xai.top_factors)) {
+
+    return `
+      <div class="xai-panel">
+        <h4>Explication indisponible</h4>
+        <p>
+          L'API n'a pas retourné les informations SHAP.
+          Vérifiez la configuration XAI du backend.
+        </p>
+      </div>
+    `;
+
+  }
+
+  const factors = xai.top_factors.map(factor => {
+
+    let directionClass = "xai-neutral";
+
+    if (factor.direction === "increases") {
+      directionClass = "xai-up";
+    } else if (factor.direction === "decreases") {
+      directionClass = "xai-down";
+    }
+
+    const directionLabel =
+      factor.direction_label || "Influence neutre";
+
+    return `
+      <div class="xai-factor">
+
+        <div>
+
+          <div class="xai-factor-name">
+            ${escapeHTML(factor.label || factor.feature)}
+          </div>
+
+          <span class="xai-factor-value">
+            Valeur de l'étudiant :
+            ${escapeHTML(factor.value)}
+          </span>
+
+        </div>
+
+        <div class="${directionClass}">
+          ${escapeHTML(directionLabel)}
+        </div>
+
+      </div>
+    `;
+
+  }).join("");
+
+
+  const recommendations = (xai.recommendations || []).map(item => {
+
+    return `<li>${escapeHTML(item)}</li>`;
+
+  }).join("");
+
+
+  return `
+    <div class="xai-panel">
+
+      <h4>Pourquoi cette prédiction ?</h4>
+
+      <p class="xai-summary">
+        ${escapeHTML(
+          xai.summary ||
+          "Les facteurs suivants contribuent à la prédiction du modèle."
+        )}
+      </p>
+
+      <h4>Facteurs les plus influents pour cet étudiant</h4>
+
+      ${factors || "<p>Aucun facteur disponible.</p>"}
+
+      <h4 style="margin-top:18px;">
+        Recommandations d'accompagnement
+      </h4>
+
+      ${
+        recommendations
+          ? `<ul class="xai-recommendations">${recommendations}</ul>`
+          : "<p>Aucune recommandation disponible.</p>"
+      }
+
+      <div class="xai-note">
+
+        ${escapeHTML(
+          xai.disclaimer ||
+          "Les valeurs SHAP décrivent la contribution des variables à la prédiction du modèle. Elles ne prouvent pas une relation de cause à effet."
+        )}
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+// =====================================================
+// 12. XAI XML GENERATION
+// =====================================================
+
+function xaiToXML(xai) {
+
+  if (!xai) {
+
+    return `
+      <XAIExplanation>
+        <Status>Unavailable</Status>
+      </XAIExplanation>
+    `;
+
+  }
+
+
+  const factors = (xai.top_factors || []).map(factor => {
+
+    return `
+      <Factor>
+
+        <Feature>${xmlEscape(factor.feature)}</Feature>
+
+        <Label>${xmlEscape(factor.label)}</Label>
+
+        <Value>${xmlEscape(factor.value)}</Value>
+
+        <ShapValue>${xmlEscape(factor.shap_value)}</ShapValue>
+
+        <Direction>${xmlEscape(factor.direction)}</Direction>
+
+        <DirectionLabel>
+          ${xmlEscape(factor.direction_label)}
+        </DirectionLabel>
+
+      </Factor>
+    `;
+
+  }).join("");
+
+
+  const recommendations = (xai.recommendations || []).map(item => {
+
+    return `
+      <Recommendation>
+        ${xmlEscape(item)}
+      </Recommendation>
+    `;
+
+  }).join("");
+
+
+  return `
+    <XAIExplanation>
+
+      <Method>${xmlEscape(xai.method || "SHAP")}</Method>
+
+      <Summary>${xmlEscape(xai.summary || "")}</Summary>
+
+      <OutputExplained>
+        ${xmlEscape(xai.output_explained || "Dropout class")}
+      </OutputExplained>
+
+      <TopFactors>
+        ${factors}
+      </TopFactors>
+
+      <Recommendations>
+        ${recommendations}
+      </Recommendations>
+
+      <Disclaimer>
+        ${xmlEscape(xai.disclaimer || "")}
+      </Disclaimer>
+
+    </XAIExplanation>
+  `;
+
+}
+
+
+// =====================================================
+// 13. RESET FORM
+// =====================================================
+
+document.getElementById("studentForm")
+  .addEventListener("reset",function() {
+
+    setTimeout(function() {
+
+      document.getElementById("Success_Rate").value = "";
+
+      document.getElementById("individualMessage").className =
+        "validation-box";
+
+      document.getElementById("individualMessage").textContent = "";
+
+      latestXMLData = null;
+
+      showXMLButton(false);
+
+    },0);
+
+  });
+
+
+// =====================================================
+// 14. INDIVIDUAL PREDICTION
+// =====================================================
+
+document.getElementById("studentForm")
+  .addEventListener("submit",async function(event) {
+
+    event.preventDefault();
+
+    const form = event.currentTarget;
+
+    if (!form.reportValidity()) return;
+
+    updateSuccessRate();
+
+    const successRateInput =
+      document.getElementById("Success_Rate");
+
+    if (successRateInput.value === "") {
+
+      showMessage(
+        "individualMessage",
+        "Impossible de calculer Success_Rate. Vérifiez les unités inscrites et approuvées.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const formData = new FormData(form);
+
+    const studentData = {};
+
+
+    for (const [key,value] of formData.entries()) {
+
+      const numericValue = Number(value);
+
+      if (!Number.isFinite(numericValue)) {
+
+        showMessage(
+          "individualMessage",
+          "Une valeur numérique est invalide : "+key,
+          "error"
+        );
+
+        return;
+
+      }
+
+      studentData[key] = numericValue;
+
+    }
+
+
+    const missing = REQUIRED_COLUMNS.filter(column => {
+
+      return !Object.prototype.hasOwnProperty.call(
+        studentData,
+        column
+      );
+
+    });
+
+
+    if (missing.length > 0) {
+
+      showMessage(
+        "individualMessage",
+        "Champs manquants : "+missing.join(", "),
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const submitButton =
+      form.querySelector('button[type="submit"]');
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Prédiction en cours...";
+
+    latestXMLData = null;
+    showXMLButton(false);
+
+    showResult(
+      "<strong>Prédiction en cours...</strong><br>Connexion au modèle Random Forest et calcul de l'explication SHAP."
+    );
+
+
+    try {
+
+      const response = await fetch(`${API_BASE}/predict`, {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          data:studentData
+        })
+
+      });
+
+
+      let payload;
+
+      try {
+
+        payload = await response.json();
+
+      } catch {
+
+        throw new Error(
+          "Le serveur a retourné une réponse non JSON."
+        );
+
+      }
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          getApiErrorMessage(
+            payload,
+            `Erreur HTTP ${response.status}`
+          )
+        );
+
+      }
+
+
+      if (!payload.success || !payload.result) {
+
+        throw new Error(
+          "La réponse de l'API ne contient pas le résultat attendu."
+        );
+
+      }
+
+
+      const predictionResult = payload.result;
+
+      const prediction = predictionResult.prediction;
+
+      const probabilities =
+        predictionResult.probabilities || {};
+
+      const dropoutProbability =
+        predictionResult.dropout_probability;
+
+      const explanation =
+        predictionResult.explanation;
+
+
+      latestXMLData = {
+
+        type:"individual",
+
+        result:predictionResult,
+
+        input:studentData
+
+      };
+
+
+      const isDropout = String(prediction) === "1";
+
+      const predictionColor = isDropout
+        ? "#c44747"
+        : "#16845b";
+
+
+      showResult(`
+
+        <div style="text-align:left;">
+
+          <h3 style="margin-bottom:14px;">
+            Résultat de la prédiction
+          </h3>
+
+          <p style="margin-bottom:12px;">
+
+            <strong>Classe prédite :</strong>
+
+            <span style="color:${predictionColor};font-weight:bold;">
+              ${escapeHTML(getPredictedLabel(prediction))}
+            </span>
+
+          </p>
+
+          <p style="margin-bottom:12px;">
+
+            <strong>Probabilité de décrochage :</strong>
+
+            ${formatProbability(dropoutProbability)}
+
+          </p>
+
+          <p style="margin-bottom:12px;">
+
+            <strong>Probabilité classe 0 (Non-Dropout) :</strong>
+
+            ${formatProbability(probabilities["0"])}
+
+          </p>
+
+          <p>
+
+            <strong>Probabilité classe 1 (Dropout) :</strong>
+
+            ${formatProbability(probabilities["1"])}
+
+          </p>
+
+          ${renderXaiExplanation(explanation)}
+
+        </div>
+
+      `);
+
+
+      showMessage(
+        "individualMessage",
+        "Prédiction et explication SHAP réalisées avec succès.",
+        "success"
+      );
+
+      showXMLButton(true);
+
+
+    } catch(error) {
+
+      latestXMLData = null;
+      showXMLButton(false);
+
+      showResult(`
+
+        <strong style="color:#c44747;">
+          Erreur lors de la prédiction
+        </strong>
+
+        <br><br>
+
+        ${escapeHTML(error.message)}
+
+        <br><br>
+
+        Vérifiez que le serveur FastAPI est démarré à l'adresse :
+
+        ${escapeHTML(API_BASE)}
+
+      `);
+
+
+      showMessage(
+        "individualMessage",
+        "La prédiction n'a pas pu être réalisée. "+error.message,
+        "error"
+      );
+
+
+    } finally {
+
+      submitButton.disabled = false;
+
+      submitButton.textContent = "Lancer la prédiction";
+
+    }
+
+  });
+
+
+// =====================================================
+// 15. CSV FILE SELECTION
+// =====================================================
+
+document.getElementById("csvFile")
+  .addEventListener("change",function(event) {
+
+    selectedCSV = event.target.files[0] || null;
+
+    const fileInfo =
+      document.getElementById("fileInfo");
+
+    const validation =
+      document.getElementById("csvValidation");
+
+    const validateButton =
+      document.getElementById("validateCsvButton");
+
+
+    validation.className = "validation-box";
+    validation.textContent = "";
+
+    latestXMLData = null;
+    showXMLButton(false);
+
+
+    if (!selectedCSV) {
+
+      fileInfo.textContent = "";
+      validateButton.disabled = true;
+      return;
+
+    }
+
+
+    if (!selectedCSV.name.toLowerCase().endsWith(".csv")) {
+
+      fileInfo.textContent = "";
+
+      showMessage(
+        "csvValidation",
+        "Veuillez sélectionner un fichier CSV.",
+        "error"
+      );
+
+      validateButton.disabled = true;
+      selectedCSV = null;
+
+      return;
+
+    }
+
+
+    fileInfo.textContent =
+      "Fichier sélectionné : "+selectedCSV.name;
+
+    validateButton.disabled = false;
+
+  });
+
+
+// =====================================================
+// 16. CSV LINE PARSER
+// =====================================================
+
+function parseCSVLine(line,separator) {
+
+  const values = [];
+
+  let current = "";
+
+  let insideQuotes = false;
+
+
+  for (let i=0;i<line.length;i++) {
+
+    const char = line[i];
+
+    if (char === '"') {
+
+      if (insideQuotes && line[i+1] === '"') {
+
+        current += '"';
+        i++;
+
+      } else {
+
+        insideQuotes = !insideQuotes;
+
+      }
+
+    } else if (char === separator && !insideQuotes) {
+
+      values.push(current);
+      current = "";
+
+    } else {
+
+      current += char;
+
+    }
+
+  }
+
+
+  values.push(current);
+
+  if (values.length > 0) {
+
+    values[0] = values[0].replace(/^\uFEFF/,"");
+
+  }
+
+  return values;
+
+}
+
+
+// =====================================================
+// 17. CSV BATCH PREDICTION
+// =====================================================
+
+async function validateCSV() {
+
+  if (!selectedCSV) return;
+
+  const validateButton =
+    document.getElementById("validateCsvButton");
+
+  validateButton.disabled = true;
+
+  validateButton.textContent =
+    "Vérification et prédiction...";
+
+  latestXMLData = null;
+  showXMLButton(false);
+
+
+  try {
+
+    const content = await selectedCSV.text();
+
+    const firstLine = content.split(/\r?\n/)[0];
+
+    if (!firstLine || !firstLine.trim()) {
+
+      throw new Error("Le fichier CSV est vide.");
+
+    }
+
+
+    const separator = firstLine.includes(";")
+      ? ";"
+      : ",";
+
+    const headers = parseCSVLine(
+      firstLine,
+      separator
+    );
+
+
+    const missingColumns = REQUIRED_COLUMNS.filter(
+      column => !headers.includes(column)
+    );
+
+
+    if (missingColumns.length > 0) {
+
+      showMessage(
+        "csvValidation",
+        "Colonnes manquantes : "+missingColumns.join(" | "),
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    showMessage(
+      "csvValidation",
+      "Les 31 colonnes requises sont présentes. Envoi du fichier au modèle...",
+      "success"
+    );
+
+
+    showResult(
+      "<strong>Traitement CSV en cours...</strong><br>Le modèle analyse les étudiants et calcule leurs explications SHAP."
+    );
+
+
+    const formData = new FormData();
+
+    formData.append("file",selectedCSV);
+
+
+    const response = await fetch(
+      `${API_BASE}/predict/csv`,
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+
+    let payload;
+
+    try {
+
+      payload = await response.json();
+
+    } catch {
+
+      throw new Error(
+        "Le serveur a retourné une réponse non JSON."
+      );
+
+    }
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        getApiErrorMessage(
+          payload,
+          `Erreur HTTP ${response.status}`
+        )
+      );
+
+    }
+
+
+    if (
+      !payload.success ||
+      !Array.isArray(payload.results)
+    ) {
+
+      throw new Error(
+        "La réponse CSV de l'API est incomplète."
+      );
+
+    }
+
+
+    latestXMLData = {
+
+      type:"batch",
+
+      result:payload,
+
+      filename:selectedCSV.name
+
+    };
+
+
+    displayBatchResults(payload);
+
+
+    showMessage(
+      "csvValidation",
+      `Prédiction terminée : ${payload.total_students} étudiant(s) traité(s), avec explications XAI.`,
+      "success"
+    );
+
+
+    showXMLButton(true);
+
+
+  } catch(error) {
+
+    latestXMLData = null;
+    showXMLButton(false);
+
+    showResult(`
+
+      <strong style="color:#c44747;">
+        Erreur lors du traitement CSV
+      </strong>
+
+      <br><br>
+
+      ${escapeHTML(error.message)}
+
+      <br><br>
+
+      Vérifiez que le serveur FastAPI est démarré
+      et que le fichier respecte le format attendu.
+
+    `);
+
+
+    showMessage(
+      "csvValidation",
+      "Le traitement du fichier a échoué : "+error.message,
+      "error"
+    );
+
+
+  } finally {
+
+    validateButton.disabled = false;
+
+    validateButton.textContent =
+      "Vérifier et prédire";
+
+  }
+
+}
+
+
+// =====================================================
+// 18. DISPLAY BATCH RESULTS + INDIVIDUAL XAI
+// =====================================================
+
+function displayBatchResults(data) {
+
+  const results = data.results || [];
+
+  const dropoutCount = results.filter(
+    item => String(item.prediction) === "1"
+  ).length;
+
+  const nonDropoutCount =
+    results.length-dropoutCount;
+
+
+  const rows = results.map(item => {
+
+    const label = getPredictedLabel(item.prediction);
+
+    const color = String(item.prediction) === "1"
+      ? "#c44747"
+      : "#16845b";
+
+
+    return `
+
+      <tr>
+
+        <td>${escapeHTML(item.row)}</td>
+
+        <td style="color:${color};font-weight:bold;">
+          ${escapeHTML(label)}
+        </td>
+
+        <td>
+          ${formatProbability(item.dropout_probability)}
+        </td>
+
+        <td>
+
+          <details class="batch-xai">
+
+            <summary>
+              Voir l'explication SHAP
+            </summary>
+
+            ${renderXaiExplanation(item.explanation)}
+
+          </details>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }).join("");
+
+
+  showResult(`
+
+    <div style="text-align:left;">
+
+      <h3 style="margin-bottom:14px;">
+        Résultats du traitement CSV
+      </h3>
+
+      <p>
+        <strong>Nombre total d'étudiants :</strong>
+        ${escapeHTML(results.length)}
+      </p>
+
+      <p>
+        <strong>Prédictions Dropout :</strong>
+        ${dropoutCount}
+      </p>
+
+      <p>
+        <strong>Prédictions Non-Dropout :</strong>
+        ${nonDropoutCount}
+      </p>
+
+
+      <div class="result-table-wrap">
+
+        <table class="result-table">
+
+          <thead>
+
+            <tr>
+
+              <th>Ligne</th>
+
+              <th>Prédiction</th>
+
+              <th>Probabilité Dropout</th>
+
+              <th>Explication XAI</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+            ${rows}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  `);
+
+}
+
+
+// =====================================================
+// 19. XML EXPORT
+// =====================================================
+
+function downloadXML() {
+
+  if (!latestXMLData) return;
+
+  let xml = "";
+
+
+  // -----------------------------------
+  // Individual XML
+  // -----------------------------------
+
+  if (latestXMLData.type === "individual") {
+
+    const result = latestXMLData.result;
+
+    const input = latestXMLData.input;
+
+    const probabilities =
+      result.probabilities || {};
+
+
+    const featuresXML = Object.entries(input).map(
+      ([name,value]) => {
+
+        return `
+
+          <Feature>
+
+            <Name>${xmlEscape(name)}</Name>
+
+            <Value>${xmlEscape(value)}</Value>
+
+          </Feature>
+
+        `;
+
+      }
+    ).join("");
+
+
+    xml = `<?xml version="1.0" encoding="UTF-8"?>
+
+<StudentPrediction>
+
+  <Prediction>
+    ${xmlEscape(result.prediction)}
+  </Prediction>
+
+  <PredictedLabel>
+    ${xmlEscape(getPredictedLabel(result.prediction))}
+  </PredictedLabel>
+
+  <DropoutProbability>
+    ${xmlEscape(result.dropout_probability)}
+  </DropoutProbability>
+
+  <Probabilities>
+
+    <NonDropout>
+      ${xmlEscape(probabilities["0"])}
+    </NonDropout>
+
+    <Dropout>
+      ${xmlEscape(probabilities["1"])}
+    </Dropout>
+
+  </Probabilities>
+
+  ${xaiToXML(result.explanation)}
+
+  <InputFeatures>
+    ${featuresXML}
+  </InputFeatures>
+
+</StudentPrediction>`;
+
+  }
+
+
+  // -----------------------------------
+  // Batch XML
+  // -----------------------------------
+
+  else if (latestXMLData.type === "batch") {
+
+    const data = latestXMLData.result;
+
+
+    const studentsXML = (data.results || []).map(item => {
+
+      const probabilities =
+        item.probabilities || {};
+
+
+      return `
+
+        <Student>
+
+          <Row>
+            ${xmlEscape(item.row)}
+          </Row>
+
+          <Prediction>
+            ${xmlEscape(item.prediction)}
+          </Prediction>
+
+          <PredictedLabel>
+            ${xmlEscape(getPredictedLabel(item.prediction))}
+          </PredictedLabel>
+
+          <DropoutProbability>
+            ${xmlEscape(item.dropout_probability)}
+          </DropoutProbability>
+
+          <Probabilities>
+
+            <NonDropout>
+              ${xmlEscape(probabilities["0"])}
+            </NonDropout>
+
+            <Dropout>
+              ${xmlEscape(probabilities["1"])}
+            </Dropout>
+
+          </Probabilities>
+
+          ${xaiToXML(item.explanation)}
+
+        </Student>
+
+      `;
+
+    }).join("");
+
+
+    xml = `<?xml version="1.0" encoding="UTF-8"?>
+
+<BatchPredictions>
+
+  <SourceFile>
+    ${xmlEscape(latestXMLData.filename)}
+  </SourceFile>
+
+  <TotalStudents>
+    ${xmlEscape(data.total_students)}
+  </TotalStudents>
+
+  <Students>
+    ${studentsXML}
+  </Students>
+
+</BatchPredictions>`;
+
+  }
+
+
+  const blob = new Blob(
+    [xml],
+    {type:"application/xml;charset=utf-8"}
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+
+  link.download =
+    latestXMLData.type === "individual"
+      ? "prediction_etudiant_XAI.xml"
+      : "predictions_etudiants_XAI.xml";
+
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+
+}
+
+
+// =====================================================
+// 20. CSV TEMPLATE DOWNLOAD
+// =====================================================
+
+function downloadTemplate() {
+
+  const header = REQUIRED_COLUMNS.map(column => {
+
+    return '"' + column.replace(/"/g,'""') + '"';
+
+  }).join(",");
+
+
+  const csvContent = "\uFEFF"+header+"\r\n";
+
+  const blob = new Blob(
+    [csvContent],
+    {type:"text/csv;charset=utf-8;"}
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+
+  link.download = "template_etudiants.csv";
+
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+
+}
+
+</script>
+
+</body>
+</html>

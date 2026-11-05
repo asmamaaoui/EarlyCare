@@ -1,0 +1,4 @@
+python -m venv venv
+venv\Scripts\activate
+cd C:\Users\asmam\Desktop\M2\2025-2026\machine learning\ds\interface\backend
+uvicorn app:app --reload
