@@ -1,10 +1,9 @@
+
 from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
-import shap
 
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,15 +42,6 @@ DROPOUT_CLASS_INDEX = next(
 if DROPOUT_CLASS_INDEX is None:
     raise ValueError("Dropout class 1 not found")
 
-# SHAP explainer for Random Forest
-# استخراج آخر عنصر داخل Pipeline
-if hasattr(model, "steps"):
-    final_estimator = model.steps[-1][1]
-else:
-    final_estimator = model
-
-# إنشاء SHAP Explainer باستعمال الـ estimator النهائي
-explainer = shap.TreeExplainer(final_estimator)
 print("Model loaded successfully!")
 print("Number of features:", len(FEATURES))
 print("Model classes:", CLASSES)
@@ -63,8 +53,11 @@ print("Model classes:", CLASSES)
 
 app = FastAPI(
     title="Student Dropout Prediction API",
-    description="Student Dropout Prediction with SHAP Explainability",
-    version="2.0.0"
+    description=(
+        "Student Dropout Prediction API "
+        "(SHAP temporarily disabled for diagnosis)"
+    ),
+    version="2.1.0"
 )
 
 app.add_middleware(
@@ -127,256 +120,10 @@ def get_dropout_probability(probabilities):
     )
 
 
-def get_shap_vector(shap_values, row_index):
-
-    if isinstance(shap_values, list):
-
-        return np.asarray(
-            shap_values[DROPOUT_CLASS_INDEX][row_index]
-        ).reshape(-1)
-
-    values = np.asarray(shap_values)
-
-    if values.ndim == 3:
-
-        if values.shape[-1] == len(CLASSES):
-
-            return values[
-                row_index,
-                :,
-                DROPOUT_CLASS_INDEX
-            ].reshape(-1)
-
-        if values.shape[0] == len(CLASSES):
-
-            return values[
-                DROPOUT_CLASS_INDEX,
-                row_index,
-                :
-            ].reshape(-1)
-
-    if values.ndim == 2:
-
-        return values[row_index].reshape(-1)
-
-    raise ValueError(
-        f"Unsupported SHAP shape: {values.shape}"
-    )
-
-
-def get_direction(shap_value):
-
-    if shap_value > 0:
-
-        return {
-            "direction": "increases",
-            "direction_label": "Augmente le risque prédit"
-        }
-
-    elif shap_value < 0:
-
-        return {
-            "direction": "decreases",
-            "direction_label": "Diminue le risque prédit"
-        }
-
-    return {
-        "direction": "neutral",
-        "direction_label": "Influence neutre"
-    }
-
-
-# =====================================
-# 5. RECOMMENDATIONS
-# =====================================
-
-def generate_recommendations(top_factors):
-
-    recommendations = []
-
-    for factor in top_factors:
-
-        if factor["direction"] != "increases":
-            continue
-
-        feature = factor["feature"]
-
-        if feature in [
-            "Success_Rate",
-            "Curricular units 1st sem (approved)"
-        ]:
-
-            recommendation = (
-                "Proposer un accompagnement pédagogique "
-                "et du tutorat dans les matières difficiles."
-            )
-
-        elif feature == "Curricular units 1st sem (without evaluations)":
-
-            recommendation = (
-                "Contacter l'étudiant pour comprendre les absences "
-                "aux évaluations et identifier les difficultés."
-            )
-
-        elif feature in [
-            "Curricular units 1st sem (grade)",
-            "Admission grade",
-            "Previous qualification (grade)"
-        ]:
-
-            recommendation = (
-                "Évaluer les besoins de remise à niveau "
-                "et proposer un soutien académique adapté."
-            )
-
-        elif feature in [
-            "Debtor",
-            "Tuition fees up to date"
-        ]:
-
-            recommendation = (
-                "Vérifier si l'étudiant rencontre des difficultés "
-                "financières et l'orienter vers le service compétent."
-            )
-
-        elif feature == "Age at enrollment":
-
-            recommendation = (
-                "Organiser un échange individuel pour identifier "
-                "les contraintes personnelles ou professionnelles."
-            )
-
-        else:
-
-            recommendation = (
-                "Examiner ce facteur avec l'étudiant afin de vérifier "
-                "s'il existe un besoin particulier d'accompagnement."
-            )
-
-        if recommendation not in recommendations:
-
-            recommendations.append(recommendation)
-
-    if not recommendations:
-
-        recommendations.append(
-            "Maintenir le suivi pédagogique régulier "
-            "et vérifier périodiquement la situation de l'étudiant."
-        )
-
-    return recommendations[:4]
-
-
-# =====================================
-# 6. SHAP EXPLANATION
-# =====================================
-
-def explain_students(X):
-
-    shap_values = explainer.shap_values(
-        X,
-        check_additivity=False
-    )
-
-    explanations = []
-
-    for row_index in range(len(X)):
-
-        values = get_shap_vector(
-            shap_values,
-            row_index
-        )
-
-        if len(values) != len(FEATURES):
-
-            raise ValueError(
-                "SHAP feature count does not match model features"
-            )
-
-        factors = []
-
-        for feature, shap_value in zip(FEATURES, values):
-
-            raw_value = X.iloc[row_index][feature]
-
-            if hasattr(raw_value, "item"):
-                raw_value = raw_value.item()
-
-            direction = get_direction(
-                float(shap_value)
-            )
-
-            factors.append({
-
-                "feature": feature,
-
-                "label": FEATURE_LABELS.get(
-                    feature,
-                    feature
-                ),
-
-                "value": raw_value,
-
-                "shap_value": round(
-                    float(shap_value),
-                    6
-                ),
-
-                "direction": direction["direction"],
-
-                "direction_label": direction["direction_label"]
-
-            })
-
-        # Sort by absolute SHAP contribution
-        factors.sort(
-            key=lambda x: abs(x["shap_value"]),
-            reverse=True
-        )
-
-        top_factors = factors[:5]
-
-        summary = (
-            "Les facteurs ayant le plus contribué "
-            "à la prédiction sont : "
-            + ", ".join(
-                factor["label"]
-                for factor in top_factors[:3]
-            )
-            + "."
-        )
-
-        recommendations = generate_recommendations(
-            top_factors
-        )
-
-        explanations.append({
-
-            "method": "SHAP TreeExplainer",
-
-            "summary": summary,
-
-            "top_factors": top_factors,
-
-            "recommendations": recommendations,
-
-            "disclaimer": (
-                "Les valeurs SHAP expliquent la contribution "
-                "des variables à la prédiction du modèle. "
-                "Elles ne prouvent pas une relation de cause à effet. "
-                "Les recommandations sont des pistes d'accompagnement."
-            )
-
-        })
-
-    return explanations
-
-
-# =====================================
-# 7. STUDENT VALIDATION
-# =====================================
-
 def validate_student_data(data):
+
+    if not isinstance(data, dict):
+        raise ValueError("Student data must be a dictionary")
 
     missing = [
         col for col in FEATURES
@@ -384,7 +131,6 @@ def validate_student_data(data):
     ]
 
     if missing:
-
         raise ValueError(
             f"Missing columns: {missing}"
         )
@@ -395,14 +141,48 @@ def validate_student_data(data):
     ]
 
     if extra:
-
         raise ValueError(
             f"Unexpected columns: {extra}"
         )
 
 
 # =====================================
-# 8. INDIVIDUAL PREDICTION
+# 5. TEMPORARY XAI PLACEHOLDER
+# =====================================
+
+def explain_students(X):
+
+    explanations = []
+
+    for _ in range(len(X)):
+
+        explanations.append({
+
+            "method": "SHAP temporarily disabled",
+
+            "summary": (
+                "L'explication SHAP est temporairement "
+                "désactivée pour le diagnostic technique."
+            ),
+
+            "top_factors": [],
+
+            "recommendations": [],
+
+            "disclaimer": (
+                "La prédiction est générée par le modèle "
+                "Random Forest. Les explications SHAP "
+                "seront réactivées après résolution "
+                "du problème technique."
+            )
+
+        })
+
+    return explanations
+
+
+# =====================================
+# 6. INDIVIDUAL PREDICTION LOGIC
 # =====================================
 
 def predict_student(data):
@@ -419,14 +199,11 @@ def predict_student(data):
     probabilities = model.predict_proba(df)[0]
 
     probability_dict = {
-
         str(label): round(float(prob), 4)
-
         for label, prob in zip(
             CLASSES,
             probabilities
         )
-
     }
 
     explanation = explain_students(df)[0]
@@ -447,7 +224,7 @@ def predict_student(data):
 
 
 # =====================================
-# 9. HEALTH CHECK
+# 7. HEALTH CHECK
 # =====================================
 
 @app.get("/")
@@ -466,9 +243,9 @@ def health():
 
         "model_loaded": True,
 
-        "xai_loaded": True,
+        "xai_loaded": False,
 
-        "xai_method": "SHAP TreeExplainer",
+        "xai_method": "Temporarily disabled for diagnosis",
 
         "number_of_features": len(FEATURES),
 
@@ -480,13 +257,17 @@ def health():
 
 
 # =====================================
-# 10. INDIVIDUAL PREDICTION ENDPOINT
+# 8. REQUEST MODEL
 # =====================================
 
 class StudentData(BaseModel):
 
     data: dict[str, Any]
 
+
+# =====================================
+# 9. INDIVIDUAL PREDICTION ENDPOINT
+# =====================================
 
 @app.post("/predict")
 def predict(data: StudentData):
@@ -521,13 +302,16 @@ def predict(data: StudentData):
 
 
 # =====================================
-# 11. CSV BATCH PREDICTION
+# 10. CSV BATCH PREDICTION
 # =====================================
 
 @app.post("/predict/csv")
 async def predict_csv(file: UploadFile = File(...)):
 
-    if not file.filename or not file.filename.lower().endswith(".csv"):
+    if (
+        not file.filename
+        or not file.filename.lower().endswith(".csv")
+    ):
 
         raise HTTPException(
             status_code=400,
@@ -543,6 +327,7 @@ async def predict_csv(file: UploadFile = File(...)):
             engine="python"
         )
 
+        # Remove BOM if present
         df.columns = [
             col.removeprefix("\ufeff")
             for col in df.columns
@@ -563,12 +348,23 @@ async def predict_csv(file: UploadFile = File(...)):
                 }
             )
 
+        if df.empty:
+
+            raise HTTPException(
+                status_code=400,
+                detail="The CSV file contains no student records"
+            )
+
+        # Keep the exact model feature order
         X = df[FEATURES].copy()
 
+        # Predictions
         predictions = model.predict(X)
 
+        # Class probabilities
         probabilities = model.predict_proba(X)
 
+        # Temporary explanations without SHAP
         explanations = explain_students(X)
 
         results = []
@@ -582,14 +378,11 @@ async def predict_csv(file: UploadFile = File(...)):
         ):
 
             probability_dict = {
-
                 str(label): round(float(prob), 4)
-
                 for label, prob in zip(
                     CLASSES,
                     probs
                 )
-
             }
 
             results.append({
@@ -639,3 +432,4 @@ async def predict_csv(file: UploadFile = File(...)):
     finally:
 
         file.file.close()
+
